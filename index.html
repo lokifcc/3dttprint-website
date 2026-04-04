@@ -745,16 +745,16 @@
         <div class="contact-detail"><div class="icon">📍</div><span>45219 Essen-Kettwig · Versand deutschlandweit</span></div>
       </div>
 
-      <form class="contact-form" onsubmit="handleSubmit(event)">
+      <form class="contact-form" action="https://formspree.io/f/xykbbkql" method="POST">
         <div class="form-row">
-          <div class="form-group"><label>Vorname</label><input type="text" placeholder="Max" /></div>
-          <div class="form-group"><label>Nachname</label><input type="text" placeholder="Mustermann" /></div>
+          <div class="form-group"><label>Vorname</label><input type="text" name="vorname" placeholder="Max" /></div>
+          <div class="form-group"><label>Nachname</label><input type="text" name="nachname" placeholder="Mustermann" /></div>
         </div>
-        <div class="form-group"><label>Unternehmen (optional)</label><input type="text" placeholder="Musterfirma GmbH" /></div>
-        <div class="form-group"><label>E-Mail</label><input type="email" placeholder="max@musterfirma.de" /></div>
+        <div class="form-group"><label>Unternehmen (optional)</label><input type="text" name="unternehmen" placeholder="Musterfirma GmbH" /></div>
+        <div class="form-group"><label>E-Mail</label><input type="email" name="email" placeholder="max@musterfirma.de" /></div>
         <div class="form-group">
           <label>Art des Drucks</label>
-          <select>
+          <select name="art_des_drucks">
             <option value="">Bitte wählen …</option>
             <option>Werbemittel / Werbedruck</option>
             <option>Funktions- / Zweckteil</option>
@@ -763,9 +763,8 @@
             <option>Sonstiges</option>
           </select>
         </div>
-        <div class="form-group"><label>Ihre Anfrage</label><textarea placeholder="Beschreiben Sie kurz Ihr Projekt – Menge, Maße, Material (falls bekannt) …"></textarea></div>
+        <div class="form-group"><label>Ihre Anfrage</label><textarea name="message" placeholder="Beschreiben Sie kurz Ihr Projekt – Menge, Maße, Material (falls bekannt) …"></textarea></div>
         <button type="submit" class="btn-submit-white">Anfrage absenden</button>
-        <p id="form-ok">✓ Nachricht gesendet – wir melden uns bald!</p>
       </form>
     </div>
   </section>
@@ -791,7 +790,7 @@
       <p style="font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--blue-light); margin-bottom:0.5rem;">Kontakt</p>
       <p style="color:var(--gray-light); line-height:1.8; margin-bottom:2rem;">
         Telefon: +49 157 53657212<br />
-        E-Mail: info@3dtt-print.de
+        E-Mail: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="9df4f3fbf2ddaef9e9e9b0edeff4f3e9b3f9f8">[email&#160;protected]</a>
       </p>
 
       <p style="font-size:0.78rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--blue-light); margin-bottom:0.5rem;">Umsatzsteuer</p>
@@ -825,7 +824,7 @@
     </div>
   </footer>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     function handleSubmit(e) {
       e.preventDefault();
       document.getElementById('form-ok').style.display = 'block';
@@ -834,11 +833,4 @@
 
     const io = new IntersectionObserver(entries => {
       entries.forEach(en => {
-        if (en.isIntersecting) {
-          en.target.style.opacity = '1';
-          en.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.service-card, .step, .adv-i
+        
