@@ -212,51 +212,46 @@
       position: relative; z-index: 1;
     }
 
-    .print-anim { position: relative; width: 320px; height: 380px; }
+    .print-anim { position: relative; width: 320px; height: 420px; }
 
-    .layer {
+    .vase-layer {
       position: absolute;
-      bottom: 0;
       left: 50%;
       transform: translateX(-50%) scaleY(0);
       transform-origin: center bottom;
-      border-radius: 3px;
+      border-radius: 4px;
       height: 12px;
-      background: linear-gradient(90deg, var(--blue-dim), var(--blue), var(--blue-light));
-      box-shadow: 0 0 12px rgba(26,109,255,0.4);
+      opacity: 0;
+      transition: transform 0.25s ease, opacity 0.15s ease;
     }
 
     .nozzle {
       position: absolute;
-      left: 50%; top: 0;
+      width: 10px; height: 36px;
+      background: linear-gradient(180deg, #2a3a4a, #1a2a3a);
+      border-radius: 0 0 5px 5px;
+      z-index: 10;
+      transition: left 0.35s linear;
+    }
+    .nozzle::before {
+      content: '';
+      position: absolute;
+      top: -4px; left: 50%;
       transform: translateX(-50%);
-      width: 8px; height: 32px;
-      background: #3a4a5a;
-      border-radius: 0 0 4px 4px;
-      animation: nozzleMove 3s ease-in-out infinite alternate;
-      z-index: 2;
+      width: 18px; height: 8px;
+      background: #2a3a4a;
+      border-radius: 2px;
     }
     .nozzle::after {
       content: '';
       position: absolute;
-      bottom: -6px; left: 50%;
+      bottom: -7px; left: 50%;
       transform: translateX(-50%);
-      width: 4px; height: 6px;
+      width: 5px; height: 8px;
       background: var(--blue-light);
-      border-radius: 0 0 2px 2px;
-      box-shadow: 0 0 8px var(--blue);
+      border-radius: 0 0 3px 3px;
+      box-shadow: 0 0 12px var(--blue), 0 4px 10px rgba(26,109,255,0.7);
     }
-    @keyframes nozzleMove { 0%{left:25%;} 100%{left:75%;} }
-
-    .l1 { width:180px; bottom:0;    animation: growLayer .4s .5s  ease forwards; }
-    .l2 { width:170px; bottom:14px; animation: growLayer .4s .9s  ease forwards; }
-    .l3 { width:156px; bottom:28px; animation: growLayer .4s 1.3s ease forwards; opacity:.92; }
-    .l4 { width:140px; bottom:42px; animation: growLayer .4s 1.7s ease forwards; opacity:.85; }
-    .l5 { width:122px; bottom:56px; animation: growLayer .4s 2.1s ease forwards; opacity:.78; }
-    .l6 { width:100px; bottom:70px; animation: growLayer .4s 2.5s ease forwards; opacity:.70; }
-    .l7 { width: 76px; bottom:84px; animation: growLayer .4s 2.9s ease forwards; opacity:.60; }
-    .l8 { width: 52px; bottom:98px; animation: growLayer .4s 3.3s ease forwards; opacity:.50; }
-    @keyframes growLayer { to { transform: translateX(-50%) scaleY(1); } }
 
     .grid-base {
       position: absolute;
@@ -265,6 +260,16 @@
       width: 240px; height: 20px;
       background: rgba(26,109,255,0.06);
       border: 1px solid rgba(26,109,255,0.2);
+    }
+
+    /* faint vase outline guide */
+    .vase-guide {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 200px; height: 330px;
+      opacity: 0.04;
+      pointer-events: none;
     }
 
     .stat-bubble {
@@ -605,7 +610,7 @@
       nav ul { display: none; }
       #hero { grid-template-columns: 1fr; padding: 7rem 1.5rem 4rem; gap: 3rem; }
       .hero-visual { order: -1; }
-      .print-anim { width: 240px; height: 280px; }
+      .print-anim { width: 260px; height: 340px; }
       .sb1,.sb2,.sb3 { display: none; }
       section { padding: 4rem 1.5rem; }
       .advantages-layout { grid-template-columns: 1fr; gap: 2.5rem; }
@@ -643,16 +648,9 @@
     </div>
 
     <div class="hero-visual">
-      <div class="print-anim">
-        <div class="nozzle"></div>
-        <div class="layer l1"></div>
-        <div class="layer l2"></div>
-        <div class="layer l3"></div>
-        <div class="layer l4"></div>
-        <div class="layer l5"></div>
-        <div class="layer l6"></div>
-        <div class="layer l7"></div>
-        <div class="layer l8"></div>
+      <div class="print-anim" id="print-anim-wrap">
+        <div class="nozzle" id="vase-nozzle"></div>
+        <div id="vase-layers"></div>
         <div class="grid-base"></div>
         <div class="stat-bubble sb1"><strong><span>0.1</span> mm</strong>Schichtauflösung</div>
         <div class="stat-bubble sb2"><strong><span>100</span>%</strong>Maßgenau</div>
@@ -861,6 +859,260 @@
   </footer>
 
   <script>
+    // ── 3D PRINT ANIMATION – 10 OBJECTS ──
+    (function() {
+
+      const OBJECTS = [
+        {
+          name: '🏺 Vase',
+          profile: [170,178,182,180,174,164,150,134,116,98,84,76,74,76,84,96,112,122,128,130,128,122,112,100],
+          colors: ['#1258d4','#1a6dff','#4d94ff']
+        },
+        {
+          name: '⚙️ Zahnrad',
+          profile: [
+            60,80,100,110,                  // hub base
+            130,120,130,120,130,120,130,120, // gear teeth (alternating)
+            130,120,130,120,130,120,130,120,
+            110,100,80,60                    // hub top
+          ],
+          colors: ['#0d47c4','#1a6dff','#7ab8ff']
+        },
+        {
+          name: '🔧 Schraubenschlüssel',
+          profile: [
+            90,100,110,100,90,              // head open end
+            60,50,48,48,48,48,48,48,48,48, // handle
+            48,48,48,48,48,
+            60,80,100,110,100,80,60         // closed end ring
+          ],
+          colors: ['#1258d4','#2277ff','#5599ff']
+        },
+        {
+          name: '⚡ Pokéball',
+          profile: [
+            40,70,98,118,130,138,140,       // bottom hemisphere
+            140,140,                         // equator band
+            140,138,130,118,98,70,40         // top hemisphere
+          ],
+          colors: ['#cc2222','#ee4444','#ff9999','#ffffff','#1a6dff','#4d94ff','#aaccff']
+        },
+        {
+          name: '🚀 Rakete',
+          profile: [
+            60,70,75,                        // fins base
+            80,78,76,74,72,70,               // body lower
+            68,66,64,62,60,58,56,54,52,50,  // body upper
+            46,42,36,28,20,12,6             // nose cone
+          ],
+          colors: ['#1258d4','#1a6dff','#4d94ff','#aad4ff']
+        },
+        {
+          name: '🏠 Haus',
+          profile: [
+            150,150,150,150,150,150,150,150,150,150, // walls
+            150,150,
+            160,148,136,124,112,100,88,76,64,52,40,28,16 // roof triangle
+          ],
+          colors: ['#1a6dff','#2288ff','#dd6622','#ee7733','#ffaa66']
+        },
+        {
+          name: '⭐ Stern',
+          profile: [
+            30,60,100,130,100,60,30,        // bottom point
+            90,140,160,140,90,              // middle wide
+            30,60,100,130,100,60,30         // top point
+          ],
+          colors: ['#ffcc00','#ffdd33','#ffee88']
+        },
+        {
+          name: '🏆 Pokal',
+          profile: [
+            120,110,100,90,                 // base
+            50,46,44,44,44,44,44,           // stem
+            60,80,110,130,140,144,140,130,110,80,60, // cup body
+            50,46,44,44,                    // cup stem top
+            70,90,100,90,70                 // rim
+          ],
+          colors: ['#ccaa00','#ffcc22','#ffe066','#fff3aa']
+        },
+        {
+          name: '🍄 Pilz',
+          profile: [
+            40,44,46,44,40,                 // stem
+            40,44,46,44,40,
+            60,90,120,148,162,170,168,162,148,120,90,60 // cap
+          ],
+          colors: ['#f5f5f5','#dddddd','#cc3311','#ee4422','#ff6644']
+        },
+        {
+          name: '🎄 Tannenbaum',
+          profile: [
+            30,                             // top
+            50,70,50,                       // tier 1
+            70,90,110,70,                   // tier 2
+            90,110,130,150,90,              // tier 3
+            110,130,150,170,180,110,        // tier 4 base
+            50,50,50,50                     // trunk
+          ],
+          colors: ['#115511','#228822','#33aa33','#55cc55','#8B4513']
+        }
+      ];
+
+      const LAYER_H     = 11;
+      const LAYER_GAP   = 2;
+      const STEP        = LAYER_H + LAYER_GAP;
+      const BED         = 24;
+      const DELAY       = 220;
+      const PAUSE_END   = 1600;
+      const PAUSE_FADE  = 600;
+      const PAUSE_START = 500;
+
+      const container = document.getElementById('vase-layers');
+      const nozzle    = document.getElementById('vase-nozzle');
+      if (!container || !nozzle) return;
+
+      let objIndex   = 0;
+      let cur        = 0;
+      let nozzX      = 50;
+      let nozzDir    = 1;
+      let nozzInt    = null;
+      let layerEls   = [];
+
+      function buildObject(obj) {
+        container.innerHTML = '';
+        layerEls = [];
+        const N = obj.profile.length;
+        const nc = obj.colors.length;
+        obj.profile.forEach(function(w, i) {
+          var div = document.createElement('div');
+          div.className = 'vase-layer';
+          div.style.width   = w + 'px';
+          div.style.bottom  = (BED + i * STEP) + 'px';
+          // pick color from object palette
+          var ci = Math.floor((i / N) * nc);
+          ci = Math.min(ci, nc - 1);
+          var ci2 = Math.min(ci + 1, nc - 1);
+          div.style.background = 'linear-gradient(90deg,' + obj.colors[ci] + ',' + obj.colors[ci2] + ')';
+          div.style.boxShadow  = '0 0 10px ' + obj.colors[ci] + '66';
+          container.appendChild(div);
+          layerEls.push(div);
+        });
+      }
+
+      function startNozzle(idx) {
+        var obj  = OBJECTS[objIndex];
+        var w    = obj.profile[idx] || 80;
+        var half = (w / 2) / 3.2;
+        var mn   = 50 - half;
+        var mx   = 50 + half;
+        nozzle.style.bottom = (BED + idx * STEP + LAYER_H + 8) + 'px';
+        nozzle.style.top    = 'auto';
+        clearInterval(nozzInt);
+        if (nozzX < mn) nozzX = mn;
+        if (nozzX > mx) nozzX = mx;
+        nozzInt = setInterval(function() {
+          var cw   = (OBJECTS[objIndex].profile[cur] || w);
+          var ch   = (cw / 2) / 3.2;
+          nozzX += nozzDir * 5;
+          if (nozzX >= 50 + ch) { nozzX = 50 + ch; nozzDir = -1; }
+          if (nozzX <= 50 - ch) { nozzX = 50 - ch; nozzDir =  1; }
+          nozzle.style.left = nozzX + '%';
+        }, 55);
+      }
+
+      function showLayer(idx) {
+        var el = layerEls[idx];
+        if (!el) return;
+        el.style.transition = 'transform 0.25s ease, opacity 0.2s ease';
+        el.style.opacity    = '1';
+        el.style.transform  = 'translateX(-50%) scaleY(1)';
+      }
+
+      function hideAll() {
+        layerEls.forEach(function(el) {
+          el.style.transition = 'none';
+          el.style.transform  = 'translateX(-50%) scaleY(0)';
+          el.style.opacity    = '0';
+        });
+      }
+
+      function fadeOut(cb) {
+        layerEls.forEach(function(el) {
+          el.style.transition = 'opacity ' + PAUSE_FADE + 'ms ease, transform ' + PAUSE_FADE + 'ms ease';
+          el.style.opacity    = '0';
+          el.style.transform  = 'translateX(-50%) scaleY(0.1)';
+        });
+        nozzle.style.transition = 'opacity ' + (PAUSE_FADE * 0.5) + 'ms ease';
+        nozzle.style.opacity = '0';
+        setTimeout(cb, PAUSE_FADE + 150);
+      }
+
+      function printNext() {
+        var N = OBJECTS[objIndex].profile.length;
+        if (cur >= N) {
+          clearInterval(nozzInt);
+          setTimeout(function() {
+            fadeOut(function() {
+              // next object
+              objIndex = (objIndex + 1) % OBJECTS.length;
+              cur      = 0;
+              nozzX    = 50;
+              nozzDir  = 1;
+              buildObject(OBJECTS[objIndex]);
+              nozzle.style.transition = 'none';
+              nozzle.style.opacity    = '1';
+              nozzle.style.left       = '50%';
+              nozzle.style.bottom     = (BED + LAYER_H + 8) + 'px';
+              nozzle.style.top        = 'auto';
+              setTimeout(printNext, PAUSE_START);
+            });
+          }, PAUSE_END);
+          return;
+        }
+        startNozzle(cur);
+        setTimeout(function() {
+          showLayer(cur);
+          cur++;
+          setTimeout(printNext, DELAY);
+        }, DELAY * 0.6);
+      }
+
+      // Init
+      buildObject(OBJECTS[0]);
+      nozzle.style.transition = 'none';
+      nozzle.style.left       = '50%';
+      nozzle.style.bottom     = (BED + LAYER_H + 8) + 'px';
+      nozzle.style.top        = 'auto';
+      nozzle.style.opacity    = '1';
+      nozzle.style.transform  = 'translateX(-50%)';
+
+      setTimeout(printNext, 900);
+    })();
+
+    // ── FORM ──
     function handleSubmit(e) {
       e.preventDefault();
-      document.getElemen
+      document.getElementById('form-ok').style.display = 'block';
+      e.target.querySelectorAll('input, select, textarea').forEach(function(el) { el.value = ''; });
+    }
+
+    // ── SCROLL REVEAL ──
+    var io = new IntersectionObserver(function(entries) {
+      entries.forEach(function(en) {
+        if (en.isIntersecting) {
+          en.target.style.opacity   = '1';
+          en.target.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.service-card, .step, .adv-item').forEach(function(el) {
+      el.style.opacity   = '0';
+      el.style.transform = 'translateY(20px)';
+      el.style.transition= 'opacity 0.55s ease, transform 0.55s ease';
+      io.observe(el);
+    });
+  </script>
+</body>
+</html>
