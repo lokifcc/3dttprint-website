@@ -629,6 +629,19 @@
     .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
     .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
+    /* ── MOB LOGO ── */
+    .mob-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.1em;
+      color: var(--white);
+      text-decoration: none;
+      margin-bottom: 2.5rem;
+      display: block;
+    }
+    .mob-dot { color: var(--blue); }
+    .mob-tt  { color: var(--blue-light); }
+
     /* ── MOBILE MENU OVERLAY ── */
     #mobile-menu {
       display: none;
@@ -667,15 +680,7 @@
       transition: color 0.2s;
     }
     .mob-nav-links a:hover { color: var(--blue-light); }
-    .mob-nav-links .mob-cta {
-      background: var(--blue);
-      color: var(--white) !important;
-      margin: 1.2rem 2rem;
-      border-radius: 4px;
-      padding: 0.9rem 2rem !important;
-      font-size: 1.4rem !important;
-      display: block;
-    }
+
 
     .mob-legal {
       display: flex;
@@ -718,12 +723,13 @@
   <!-- NAV -->
   <!-- MOBILE MENU OVERLAY -->
   <div id="mobile-menu">
+    <a href="#" class="mob-logo" onclick="closeMobMenu(); window.scrollTo(0,0); return false;">3D<span class="mob-dot">.</span><span class="mob-tt">TT</span><span class="mob-dot">.</span>Print</a>
     <ul class="mob-nav-links">
       <li><a href="#leistungen" onclick="closeMobMenu()">Leistungen</a></li>
       <li><a href="#vorteile" onclick="closeMobMenu()">Vorteile</a></li>
       <li><a href="#prozess" onclick="closeMobMenu()">Ablauf</a></li>
+      <li><a href="#kontakt" onclick="closeMobMenu()">Anfrage senden</a></li>
     </ul>
-    <a href="#kontakt" class="mob-cta" onclick="closeMobMenu()">Anfrage senden</a>
     <div class="mob-legal">
       <a href="#" onclick="closeMobMenu(); setTimeout(()=>document.getElementById('impressum-overlay').style.display='block',200); return false;">Impressum</a>
       <a href="#" onclick="closeMobMenu(); setTimeout(()=>document.getElementById('datenschutz-overlay').style.display='block',200); return false;">Datenschutz</a>
